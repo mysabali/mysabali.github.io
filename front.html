@@ -1019,19 +1019,26 @@
 
 
 
-    google.script.run.withSuccessHandler(res => {
-      if (res.status === "succès") {
-        goToPage(4);
-      } else {
-        alert("Erreur enregistrement packs : " + res.message);
-      }
-    }).withFailureHandler(err => {
-      alert("Erreur enregistrement packs : " + err.message);
-    }).saveDescriptionsPacks({
-      email: email,
-      entries: [], // Pas de descriptions ici
-      packs: Array.from(selectedPacks)
-    });
+    fetch(GAS_URL, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    action: "saveDescriptionsPacks",
+    email: email,
+    packs: Array.from(selectedPacks)
+  })
+})
+.then(res => res.json())
+.then(res => {
+  if (res.status === "succès") {
+    document.getElementById('page3').classList.add('hidden');
+    document.getElementById('page4').classList.remove('hidden');
+    updateProgressSteps(4);
+  } else {
+    alert(res.message);
+  }
+});
+
   });
 
   function updateProgressSteps(currentStep) {
